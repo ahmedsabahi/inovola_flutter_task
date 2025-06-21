@@ -1,0 +1,111 @@
+name: Version Bump
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "pubspec.yaml"
+      - "CHANGELOG.md"
+
+jobs:
+  version-bump:
+    name: Version Bump
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore:') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.4"
+          channel: "stable"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Get current version
+        id: current_version
+        run: |
+          CURRENT_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          # Check commit messages for semantic versioning
+          if git log --oneline -10 | grep -q "BREAKING CHANGE\|feat:"; then
+            echo "bump_type=major" >> $GITHUB_OUTPUT
+          elif git log --oneline -10 | grep -q "feat:"; then
+            echo "bump_type=minor" >> $GITHUB_OUTPUT
+          else
+            echo "bump_type=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump version
+        id: new_version
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current_version }}"
+          BUMP_TYPE="${{ steps.version_bump.outputs.bump_type }}"
+
+          # Parse current version
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          IFS='+' read -r version build <<< "$patch"
+
+          # Bump version based on type
+          case $BUMP_TYPE in
+            "major")
+              major=$((major + 1))
+              minor=0
+              version=0
+              ;;
+            "minor")
+              minor=$((minor + 1))
+              version=0
+              ;;
+            "patch")
+              version=$((version + 1))
+              ;;
+          esac
+
+          # Increment build number
+          build=$((build + 1))
+
+          NEW_VERSION="$major.$minor.$version+$build"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION"
+
+      - name: Update pubspec.yaml
+        run: |
+          sed -i "s/^version: .*/version: ${{ steps.new_version.outputs.new_version }}/" pubspec.yaml
+
+      - name: Update CHANGELOG.md
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
+
+          echo "## [${{ steps.new_version.outputs.new_version }}] - $(date +%Y-%m-%d)" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### Changes" >> CHANGELOG.md
+          echo "- Automated version bump" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "---" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          cat CHANGELOG.md | tail -n +6 >> CHANGELOG.md.tmp
+          mv CHANGELOG.md.tmp CHANGELOG.md
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "chore: bump version to ${{ steps.new_version.outputs.new_version }}"
+          git push
