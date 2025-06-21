@@ -282,8 +282,6 @@ The project includes a pre-configured keystore for Android release builds:
 android/
 ├── app/
 │   ├── upload-keystore.jks    # Keystore file (not in git)
-│   └── proguard-rules.pro     # ProGuard rules for release
-├── key.properties.template    # Template for local setup
 └── key.properties            # Keystore credentials (not in git)
 ```
 
@@ -295,13 +293,6 @@ android/
 - Consider using Google Play App Signing
 - Store credentials in environment variables for CI/CD
 
-**Local Development:**
-
-```bash
-# Copy template and configure
-cp android/key.properties.template android/key.properties
-# Edit android/key.properties with your credentials
-```
 
 **CI/CD Setup:**
 
@@ -331,7 +322,7 @@ Use the provided script to generate all required values:
 
 ```bash
 # Run the keystore preparation script
-./scripts/prepare-keystore.sh
+./prepare-keystore.sh
 
 # This will output all the values you need for GitHub Secrets
 ```
