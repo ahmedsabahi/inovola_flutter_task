@@ -162,7 +162,7 @@ return all.sublist(start, end > all.length ? all.length : end);
 ### Core Dependencies:
 
 ```yaml
-flutter_bloc: ^8.0.1 # State management
+flutter_bloc: ^9.1.1 # State management
 hive: ^2.2.3 # Local database
 dio: ^5.8.0+1 # HTTP client
 get_it: ^8.0.3 # Dependency injection
@@ -171,7 +171,6 @@ image_picker: ^1.1.2 # Image selection
 file_picker: ^10.2.0 # File selection
 flutter_svg: ^2.2.0 # SVG support
 google_fonts: ^6.2.1 # Custom fonts
-flutter_slidable: ^4.0.0 # Swipeable widgets
 uuid: ^4.5.1 # Unique identifiers
 ```
 
@@ -179,9 +178,9 @@ uuid: ^4.5.1 # Unique identifiers
 
 ```yaml
 flutter_lints: ^6.0.0 # Code linting
-build_runner: ^2.5.2 # Code generation
+build_runner: ^2.5.3 # Code generation
 mockito: ^5.4.4 # Testing
-bloc_test: ^9.1.6 # BLoC testing
+bloc_test: ^10.0.0 # BLoC testing
 hive_generator: ^2.0.1 # Hive code generation
 ```
 
@@ -232,7 +231,7 @@ flutter upgrade
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/inovola_flutter_task.git
+   git clone https://github.com/ahmedsabahi/inovola_flutter_task.git
    cd inovola_flutter_task
    ```
 
