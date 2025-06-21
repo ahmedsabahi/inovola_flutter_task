@@ -467,25 +467,6 @@ This project uses **GitHub Actions** for continuous integration and deployment w
 - Outdated dependency detection
 - Dependency tree analysis
 
-#### 5. **Firebase Deploy** (`.github/workflows/firebase-deploy.yml`)
-
-**Triggers:** Push to `main`, Manual dispatch
-
-**Purpose:** Deploy web version to Firebase Hosting
-
-### Setup Requirements:
-
-#### Repository Secrets:
-
-```bash
-# Firebase Deployment (Optional)
-FIREBASE_SERVICE_ACCOUNT=base64_encoded_service_account_json
-FIREBASE_PROJECT_ID=your_firebase_project_id
-
-# Code Coverage (Optional)
-CODECOV_TOKEN=your_codecov_token
-```
-
 #### Branch Protection Rules:
 
 - Require status checks to pass before merging
